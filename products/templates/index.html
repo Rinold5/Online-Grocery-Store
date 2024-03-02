@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <title>products</title>
-
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
 
     <style>
@@ -56,7 +56,7 @@
 
     .nav-dropdown {
       position: absolute;
-      z-index: 1;
+      z-index: 1000;
       /* Guarantees that the dropdown will display on top of any content. */
       box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
       display: none;
@@ -147,14 +147,15 @@
       top: 0;
       height: 70px;
       width: 100%;
-      background: #F3EBF6;;
+      background: #800080;;
+      color: white;
     }
 
     /*
     .nav-container – the inner wrapper for the navbar. Defines how far the actual content should stretch.
     */
     .nav-container {
-      max-width: 1000px;
+      max-width: 100%;
       margin: 0 auto;
     }
 
@@ -168,12 +169,12 @@
     }
     .brand a,
     .brand a:visited {
-      color: #463f3f;
+      color: white;
       text-decoration: none;
     }
 
     </style>
-
+    
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="text/javascript">
          (function($) { // Begin jQuery
@@ -240,17 +241,87 @@
                     </ul>
                 </li>
                 <li><a href="/logout">Log out</a></li>
+                <li><a href="/products/track_order">Track Your Order</a></li>
                 {% endif %}
                 <li><a href="/about-us">About</a></li>
+                
             </ul>
         </nav>
     </div>
 </section>
 
+<script>
+  // Function to prompt user for confirmation when adding products to cart
+  function addToCart(productId, productName, availableStock) {
+      // Prompt the user with a confirmation dialog
+      var quantity = parseInt(prompt("Enter the quantity of " + productName + " you want to add to your cart. Maximum available: " + availableStock));
+
+      // Check if the quantity entered is valid
+      if (isNaN(quantity) || quantity <= 0) {
+          alert("Please enter a valid quantity.");
+          return;
+      }
+
+      // Check if the quantity exceeds available stock
+      if (quantity > availableStock) {
+          // If the quantity exceeds available stock, display a message
+          alert("The quantity you entered exceeds the available stock.");
+          return;
+      }
+
+      // Submit the form with the entered quantity
+      document.getElementById('add-to-cart-form-' + productId).submit();
+  }
+</script>
+
+<style>
+  /* Define keyframe animation */
+  @keyframes moveHeader {
+      0% {
+          transform: translateX(100%);
+      }
+      100% {
+          transform: translateX(-100%);
+      }
+  }
+
+  /* Apply animation to the h1 element */
+  .moving-header {
+      animation: moveHeader 20s linear infinite; /* Change duration and timing function as needed */
+      white-space: nowrap;/* Prevent line breaks */
+      
+      width: 100%; /* Ensure the entire sentence is visible */
+      font-family: "Times New Roman",Times,serif; /* Change font family */
+      font-size: 30px; /* Adjust font size as needed */
+  }
+
+  ul.messages {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 20px;
+}
+</style>
+<div class="container">
+  <div class="row">
+      <div class="col">
+        <h5>Featured Products</h5>
+        <!-- Add any additional text here -->
+        <h5>New product</h5>
+      </div>
 
 <div class="row" >
-    {% for product in products %}
+  <h1 class="moving-header">Kindly note that if you order more quantity then the available stock your order wont be placed </h1>
+  
+    </div>
+  {% if messages %}
+  <ul class="messages">
+      {% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+  </ul>
+  {% endif %}
+  {% for product in products %}
     <div class="col" style="padding: 20px" >
+      
         <div class="card"
              style="width: 18rem; border-radius: 1.5rem; box-shadow: 2px 10px 20px grey;
                      font-size: 20p; font-family: Comic Sans MS; margin-top: 60px; outline: none; border: none"
@@ -261,24 +332,28 @@
             <div class="card-body" >
                 <h5 class="card-title">{{ product.name }}</h5>
                 <p class="card-text">&#8377 {{ product.price }}/kg</p>
-
+                <p class="card-text">Stock available: {{ product.stock }}</p>
 
             </div>
 
             <div class="card-footer row no-gutters"
                  style="background: none; outline: none; border: none; padding: 20px">
+
+                
+
                 {% if product|is_in_cart:request.session.cart %}
                 <div class="row" >
-
-                    <form action="/products/#{{product.id}}" method="post" class="col-2">
+                              
+                     <form action="/products/#{{product.id}}" method="post" class="col-2">
                         {% csrf_token %}
                         <input type="text" value="{{ product.id }}" hidden name="product">
                         <input type="text" value="True" hidden name="remove">
                         <input type="submit" value=" - " class="btn btn-block"
                                style="background: linear-gradient(to right, #9C27B0, #E040FB); border-radius: 20px; outline: none; border: none; color: white;
                                             font-size: 15px">
-                    </form>
+                    </form>  
 
+                    
                     <div class="text-center col">
                         {{product|count:request.session.cart}} in cart
                     </div>
@@ -290,32 +365,22 @@
                                style="background: linear-gradient(to right, #9C27B0, #E040FB); border-radius: 20px; outline: none; border: none; color: white;
                                             font-size: 15px">
                     </form>
-
                 </div>
                 {% else %}
                 <form action="/products/#{{product.id}}" method="post">
                     {% csrf_token %}
                     <input type="text" value="{{ product.id }}" hidden name="product">
-
                     <button class="btn btn-primary"
                             style="background: linear-gradient(to right, #9C27B0, #E040FB); border-radius: 20px; outline: none; border: none; width: 100%;"
                             type="submit" >Add to
                         Cart</button>
-
-
                 </form>
                 {% endif %}
-
             </div>
-
-
-
         </div>
     </div>
     {% endfor %}
-
 </div>
-
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.4.1/vanilla-tilt.min.js">
 </script>
@@ -325,13 +390,11 @@
             max: 70,
             speed: 400,
             "mouse-event-element":true,
-
           });
 </script>
-
-
-
-
 {% endblock %}
 </body>
-</html>
+</html> 
+
+
+

@@ -73,14 +73,10 @@
     font-family: 'Ubuntu', sans-serif;
     }
 
-
     .un:focus, .pass:focus {
         border: 2px solid rgba(0, 0, 0, 0.18) !important;
         color: #8C55AA;
     }
-
-
-
 
 </style>
 
@@ -241,13 +237,9 @@
                                             font-size: 15px" data-bs-toggle="modal" data-bs-target="#exampleModal">Procceed
                                 to checkout</a>
                         </form>
-
-
-
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
@@ -280,20 +272,26 @@
 <!--                                        End MODAL                                                          -->
 
 
-
-
 <script>
-  function my(){
-    var x=document.getElementById("1");
-    var y=document.getElementById("2");
-    var z=document.getElementById("3");
-    z.value = Number(y.value) - (Number(x.value) * Number(y.value)) / 100;
-  }
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log("DOM loaded");
+    
+        function my() {
+            console.log('my() function called');
+            var x = document.getElementById("1");
+            var y = document.getElementById("2");
+            var z = document.getElementById("3");
+            z.value = Number(y.value) - (Number(x.value) * Number(y.value)) / 100;
+        }
+           
+        // Call my() when the form is submitted
+        document.querySelector('form').addEventListener('submit', function(event) {
+            console.log("Form submitted");
+            my();
+        });
+    });
+    
 </script>
-<script>
-  my();
-</script>
-
 
 {% for message in messages %}
 <script>
@@ -304,9 +302,6 @@
 {% endfor %}
 
 {% endblock %}
-
-
-
 
 </body>
 </html>
